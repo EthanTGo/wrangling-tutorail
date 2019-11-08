@@ -67,3 +67,143 @@ dat5 <- read_table(url, skip=56)
 ```
 
 Here we see several ways to download and obtain the data from the web
+
+Next, we are going to learn about tidy and wide data
+
+This is what tidy data looks like
+```{r echo=FALSE, warning = FALSE, message=FALSE}
+library(dslabs)
+library(tidyverse) 
+path <- system.file("extdata", package="dslabs")
+filename <- file.path(path,  "fertility-two-countries-example.csv")
+wide_data <- read_csv(filename)
+new_tidy_data <- wide_data %>% gather(year, fertility, '1960':'2015')
+new_tidy_data
+```
+
+
+And this is what wide  data looks like 
+```{r echo = FALSE, warning = FALSE, message=FALSE}
+library(dslabs)
+library(tidyverse) 
+path <- system.file("extdata", package="dslabs")
+filename <- file.path(path,  "fertility-two-countries-example.csv")
+wide_data <- read_csv(filename)
+wide_data
+
+```
+
+## gather() and spread()
+Now, we are going to see what the gather() function which converts wide data into tidy data.
+
+The father functions takes in three arguments besides the data itself:
+<br />
+1. The first argument sets the name of the columns that we will make
+<br />
+2. Will set the name for the columns that will hold the values in the columns cells
+<br />
+3. Specifies the columns that will be gathered, by default, it is all the  columns
+<br />
+This is the original data
+``` {r warning = FALSE, message=FALSE}
+library(tidyverse) 
+library(dslabs)
+path <- system.file("extdata", package="dslabs")
+filename <- file.path(path,  "fertility-two-countries-example.csv")
+wide_data <- read_csv(filename)
+print(wide_data)
+```
+
+Now after the gather function is used
+
+```{r warning = FALSE, message=FALSE}
+library(tidyverse) 
+library(dslabs)
+path <- system.file("extdata", package="dslabs")
+filename <- file.path(path,  "fertility-two-countries-example.csv")
+wide_data <- read_csv(filename)
+new_tidy_data <- wide_data %>% gather(year, fertility, '1960':'2015')
+new_tidy_data
+```
+
+Similarly, the spread function is the **inverse** of the gather function. It converts tidy data into wide data. This has some use which will be shown later on below.
+<br />
+Here the spread function takes two argument beside the data itself:
+<br />
+1. The first argument is what variable will be used as the columns
+<br />
+2. The second is the values that will fill those columns
+
+```{r warning = FALSE, message=FALSE}
+new_wide_data <- new_tidy_data %>% spread(year, fertility)
+select(new_wide_data, country, `1960`:`1967`)
+```
+
+## separate() and unite()
+
+Now we will move on to two other useful commands, separate() and unite()
+<br />
+The separate function is a useful function that let's us separate variables
+<br />
+**First**, we need to see what kind of problems may arise that we need to use the separate() and unite() function. Look at the following graph:
+```{r warning = FALSE, message=FALSE}
+path <- system.file("extdata", package = "dslabs")
+filename <- file.path(path, "life-expectancy-and-fertility-two-countries-example.csv")
+raw_dat <- read_csv(filename)
+select(raw_dat, 1:5)
+
+# gather all columns except country
+dat <- raw_dat %>% gather(key, value, -country)
+head(dat)
+dat$key[1:5]
+
+```
+The gather commands converts wide data into tidy data. Here we name the columns key to contains all the columns in the wide data format and we name the other columns value to associate all the values that were under the columns. We also did not select the country columns. 
+
+<br />
+
+The separate() function takes in three arguments besides the data
+<br />
+1. The first argument is the columns to be separated
+<br />
+2. The second argument is the names these columns will take
+<br />
+3. Delimiter or the separate characters 
+
+```{r}
+
+dat %>% separate(key, c("year", "first_variable_name", "second_variable_name"), 
+                 fill = "right")
+#The fill = "right argument add NA values"
+
+dat %>% separate(key, c("year", "variable_name"), sep = "_", extra = "merge")
+# split on first underscore but keep life_expectancy merged
+
+dat %>% separate(key, c("year", "variable_name"), sep = "_", extra = "merge") %>%
+  spread(variable_name, value) 
+# separate then spread
+
+```
+In the example above see that because 1960_life_expectancy has 2 underscores, we need to account this, we can separate only the first underscore using the extra = "merge" command
+<br />
+Now, let me introduce you to unite, the inverse of separate. Here it takes four arguments besides the data:
+<br />
+1. The name of the columns
+<br />
+2. The first variable columns to combine
+<br />
+3. The second variable columns to combine
+<br />
+4. The delimiter
+<br />
+The final code to clean the code looks like this:
+```{r}
+dat %>% 
+  separate(key, c("year", "first_variable_name", "second_variable_name"), fill = "right") %>%
+  unite(variable_name, first_variable_name, second_variable_name, sep="_") %>%
+  spread(variable_name, value) %>%
+  rename(fertility = fertility_NA)
+
+
+
+```

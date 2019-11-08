@@ -378,26 +378,11 @@ $(document).ready(function () {
 </div>
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)</code></pre>
-<pre><code>##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00</code></pre>
-</div>
-<div id="including-plots" class="section level2">
-<h2>Including Plots</h2>
-<p>You can also embed plots, for example:</p>
 <p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
 <p>The following are notes taken during the R markdown</p>
 <pre class="r"><code>library(dslabs)
 library(tidyverse)
+
 
 #the system.file loeads data automatically from the dslabs package
 path &lt;- system.file(&quot;extdata&quot;, package=&quot;dslabs&quot;)
@@ -436,7 +421,7 @@ dat &lt;- read_csv(url)
 download.file(url, &quot;murders.csv&quot;)
 
 
-#creastes directory
+#creates directory
 tempfile()
 tmp_filename &lt;- tempfile()
 download.file(url, tmp_filename)
@@ -450,6 +435,175 @@ dat4 &lt;- read_csv(url,col_names=F)
 url &lt;- &quot;ftp://aftp.cmdl.noaa.gov/products/trends/co2/co2_annmean_mlo.txt&quot;
 read_lines(url, n_max =56)
 dat5 &lt;- read_table(url, skip=56)</code></pre>
+<p>Here we see several ways to download and obtain the data from the web</p>
+<p>Next, we are going to learn about tidy and wide data</p>
+<p>This is what tidy data looks like</p>
+<pre><code>## # A tibble: 112 x 3
+##    country     year  fertility
+##    &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;
+##  1 Germany     1960       2.41
+##  2 South Korea 1960       6.16
+##  3 Germany     1961       2.44
+##  4 South Korea 1961       5.99
+##  5 Germany     1962       2.47
+##  6 South Korea 1962       5.79
+##  7 Germany     1963       2.49
+##  8 South Korea 1963       5.57
+##  9 Germany     1964       2.49
+## 10 South Korea 1964       5.36
+## # ... with 102 more rows</code></pre>
+<p>And this is what wide data looks like</p>
+<pre><code>## # A tibble: 2 x 57
+##   country `1960` `1961` `1962` `1963` `1964` `1965` `1966` `1967` `1968`
+##   &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Germany   2.41   2.44   2.47   2.49   2.49   2.48   2.44   2.37   2.28
+## 2 South ~   6.16   5.99   5.79   5.57   5.36   5.16   4.99   4.85   4.73
+## # ... with 47 more variables: `1969` &lt;dbl&gt;, `1970` &lt;dbl&gt;, `1971` &lt;dbl&gt;,
+## #   `1972` &lt;dbl&gt;, `1973` &lt;dbl&gt;, `1974` &lt;dbl&gt;, `1975` &lt;dbl&gt;, `1976` &lt;dbl&gt;,
+## #   `1977` &lt;dbl&gt;, `1978` &lt;dbl&gt;, `1979` &lt;dbl&gt;, `1980` &lt;dbl&gt;, `1981` &lt;dbl&gt;,
+## #   `1982` &lt;dbl&gt;, `1983` &lt;dbl&gt;, `1984` &lt;dbl&gt;, `1985` &lt;dbl&gt;, `1986` &lt;dbl&gt;,
+## #   `1987` &lt;dbl&gt;, `1988` &lt;dbl&gt;, `1989` &lt;dbl&gt;, `1990` &lt;dbl&gt;, `1991` &lt;dbl&gt;,
+## #   `1992` &lt;dbl&gt;, `1993` &lt;dbl&gt;, `1994` &lt;dbl&gt;, `1995` &lt;dbl&gt;, `1996` &lt;dbl&gt;,
+## #   `1997` &lt;dbl&gt;, `1998` &lt;dbl&gt;, `1999` &lt;dbl&gt;, `2000` &lt;dbl&gt;, `2001` &lt;dbl&gt;,
+## #   `2002` &lt;dbl&gt;, `2003` &lt;dbl&gt;, `2004` &lt;dbl&gt;, `2005` &lt;dbl&gt;, `2006` &lt;dbl&gt;,
+## #   `2007` &lt;dbl&gt;, `2008` &lt;dbl&gt;, `2009` &lt;dbl&gt;, `2010` &lt;dbl&gt;, `2011` &lt;dbl&gt;,
+## #   `2012` &lt;dbl&gt;, `2013` &lt;dbl&gt;, `2014` &lt;dbl&gt;, `2015` &lt;dbl&gt;</code></pre>
+<div id="gather-and-spread" class="section level2">
+<h2>gather() and spread()</h2>
+<p>Now, we are going to see what the gather() function which converts wide data into tidy data.</p>
+<p>The father functions takes in three arguments besides the data itself: <br /> 1. The first argument sets the name of the columns that we will make <br /> 2. Will set the name for the columns that will hold the values in the columns cells <br /> 3. Specifies the columns that will be gathered, by default, it is all the columns <br /> This is the original data</p>
+<pre class="r"><code>library(tidyverse) 
+library(dslabs)
+path &lt;- system.file(&quot;extdata&quot;, package=&quot;dslabs&quot;)
+filename &lt;- file.path(path,  &quot;fertility-two-countries-example.csv&quot;)
+wide_data &lt;- read_csv(filename)
+print(wide_data)</code></pre>
+<pre><code>## # A tibble: 2 x 57
+##   country `1960` `1961` `1962` `1963` `1964` `1965` `1966` `1967` `1968`
+##   &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Germany   2.41   2.44   2.47   2.49   2.49   2.48   2.44   2.37   2.28
+## 2 South ~   6.16   5.99   5.79   5.57   5.36   5.16   4.99   4.85   4.73
+## # ... with 47 more variables: `1969` &lt;dbl&gt;, `1970` &lt;dbl&gt;, `1971` &lt;dbl&gt;,
+## #   `1972` &lt;dbl&gt;, `1973` &lt;dbl&gt;, `1974` &lt;dbl&gt;, `1975` &lt;dbl&gt;, `1976` &lt;dbl&gt;,
+## #   `1977` &lt;dbl&gt;, `1978` &lt;dbl&gt;, `1979` &lt;dbl&gt;, `1980` &lt;dbl&gt;, `1981` &lt;dbl&gt;,
+## #   `1982` &lt;dbl&gt;, `1983` &lt;dbl&gt;, `1984` &lt;dbl&gt;, `1985` &lt;dbl&gt;, `1986` &lt;dbl&gt;,
+## #   `1987` &lt;dbl&gt;, `1988` &lt;dbl&gt;, `1989` &lt;dbl&gt;, `1990` &lt;dbl&gt;, `1991` &lt;dbl&gt;,
+## #   `1992` &lt;dbl&gt;, `1993` &lt;dbl&gt;, `1994` &lt;dbl&gt;, `1995` &lt;dbl&gt;, `1996` &lt;dbl&gt;,
+## #   `1997` &lt;dbl&gt;, `1998` &lt;dbl&gt;, `1999` &lt;dbl&gt;, `2000` &lt;dbl&gt;, `2001` &lt;dbl&gt;,
+## #   `2002` &lt;dbl&gt;, `2003` &lt;dbl&gt;, `2004` &lt;dbl&gt;, `2005` &lt;dbl&gt;, `2006` &lt;dbl&gt;,
+## #   `2007` &lt;dbl&gt;, `2008` &lt;dbl&gt;, `2009` &lt;dbl&gt;, `2010` &lt;dbl&gt;, `2011` &lt;dbl&gt;,
+## #   `2012` &lt;dbl&gt;, `2013` &lt;dbl&gt;, `2014` &lt;dbl&gt;, `2015` &lt;dbl&gt;</code></pre>
+<p>Now after the gather function is used</p>
+<pre class="r"><code>library(tidyverse) 
+library(dslabs)
+path &lt;- system.file(&quot;extdata&quot;, package=&quot;dslabs&quot;)
+filename &lt;- file.path(path,  &quot;fertility-two-countries-example.csv&quot;)
+wide_data &lt;- read_csv(filename)
+new_tidy_data &lt;- wide_data %&gt;% gather(year, fertility, &#39;1960&#39;:&#39;2015&#39;)
+new_tidy_data</code></pre>
+<pre><code>## # A tibble: 112 x 3
+##    country     year  fertility
+##    &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;
+##  1 Germany     1960       2.41
+##  2 South Korea 1960       6.16
+##  3 Germany     1961       2.44
+##  4 South Korea 1961       5.99
+##  5 Germany     1962       2.47
+##  6 South Korea 1962       5.79
+##  7 Germany     1963       2.49
+##  8 South Korea 1963       5.57
+##  9 Germany     1964       2.49
+## 10 South Korea 1964       5.36
+## # ... with 102 more rows</code></pre>
+<p>Similarly, the spread function is the <strong>inverse</strong> of the gather function. It converts tidy data into wide data. This has some use which will be shown later on below. <br /> Here the spread function takes two argument beside the data itself: <br /> 1. The first argument is what variable will be used as the columns <br /> 2. The second is the values that will fill those columns</p>
+<pre class="r"><code>new_wide_data &lt;- new_tidy_data %&gt;% spread(year, fertility)
+select(new_wide_data, country, `1960`:`1967`)</code></pre>
+<pre><code>## # A tibble: 2 x 9
+##   country     `1960` `1961` `1962` `1963` `1964` `1965` `1966` `1967`
+##   &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Germany       2.41   2.44   2.47   2.49   2.49   2.48   2.44   2.37
+## 2 South Korea   6.16   5.99   5.79   5.57   5.36   5.16   4.99   4.85</code></pre>
+</div>
+<div id="separate-and-unite" class="section level2">
+<h2>separate() and unite()</h2>
+<p>Now we will move on to two other useful commands, separate() and unite() <br /> The separate function is a useful function that let’s us separate variables <br /> <strong>First</strong>, we need to see what kind of problems may arise that we need to use the separate() and unite() function. Look at the following graph:</p>
+<pre class="r"><code>path &lt;- system.file(&quot;extdata&quot;, package = &quot;dslabs&quot;)
+filename &lt;- file.path(path, &quot;life-expectancy-and-fertility-two-countries-example.csv&quot;)
+raw_dat &lt;- read_csv(filename)
+select(raw_dat, 1:5)</code></pre>
+<pre><code>## # A tibble: 2 x 5
+##   country `1960_fertility` `1960_life_expe~ `1961_fertility`
+##   &lt;chr&gt;              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1 Germany             2.41             69.3             2.44
+## 2 South ~             6.16             53.0             5.99
+## # ... with 1 more variable: `1961_life_expectancy` &lt;dbl&gt;</code></pre>
+<pre class="r"><code># gather all columns except country
+dat &lt;- raw_dat %&gt;% gather(key, value, -country)
+head(dat)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   country     key                  value
+##   &lt;chr&gt;       &lt;chr&gt;                &lt;dbl&gt;
+## 1 Germany     1960_fertility        2.41
+## 2 South Korea 1960_fertility        6.16
+## 3 Germany     1960_life_expectancy 69.3 
+## 4 South Korea 1960_life_expectancy 53.0 
+## 5 Germany     1961_fertility        2.44
+## 6 South Korea 1961_fertility        5.99</code></pre>
+<pre class="r"><code>dat$key[1:5]</code></pre>
+<pre><code>## [1] &quot;1960_fertility&quot;       &quot;1960_fertility&quot;       &quot;1960_life_expectancy&quot;
+## [4] &quot;1960_life_expectancy&quot; &quot;1961_fertility&quot;</code></pre>
+<p>The gather commands converts wide data into tidy data. Here we name the columns key to contains all the columns in the wide data format and we name the other columns value to associate all the values that were under the columns. We also did not select the country columns.</p>
+<p><br /></p>
+<p>The separate() function takes in three arguments besides the data <br /></p>
+<pre class="r"><code>dat %&gt;% separate(key, c(&quot;year&quot;, &quot;first_variable_name&quot;, &quot;second_variable_name&quot;), 
+                 fill = &quot;right&quot;)</code></pre>
+<pre><code>## # A tibble: 224 x 5
+##    country     year  first_variable_name second_variable_name value
+##    &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;               &lt;chr&gt;                &lt;dbl&gt;
+##  1 Germany     1960  fertility           &lt;NA&gt;                  2.41
+##  2 South Korea 1960  fertility           &lt;NA&gt;                  6.16
+##  3 Germany     1960  life                expectancy           69.3 
+##  4 South Korea 1960  life                expectancy           53.0 
+##  5 Germany     1961  fertility           &lt;NA&gt;                  2.44
+##  6 South Korea 1961  fertility           &lt;NA&gt;                  5.99
+##  7 Germany     1961  life                expectancy           69.8 
+##  8 South Korea 1961  life                expectancy           53.8 
+##  9 Germany     1962  fertility           &lt;NA&gt;                  2.47
+## 10 South Korea 1962  fertility           &lt;NA&gt;                  5.79
+## # ... with 214 more rows</code></pre>
+<pre class="r"><code># split on first underscore but keep life_expectancy merged
+dat %&gt;% separate(key, c(&quot;year&quot;, &quot;variable_name&quot;), sep = &quot;_&quot;, extra = &quot;merge&quot;)</code></pre>
+<pre><code>## # A tibble: 224 x 4
+##    country     year  variable_name   value
+##    &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;           &lt;dbl&gt;
+##  1 Germany     1960  fertility        2.41
+##  2 South Korea 1960  fertility        6.16
+##  3 Germany     1960  life_expectancy 69.3 
+##  4 South Korea 1960  life_expectancy 53.0 
+##  5 Germany     1961  fertility        2.44
+##  6 South Korea 1961  fertility        5.99
+##  7 Germany     1961  life_expectancy 69.8 
+##  8 South Korea 1961  life_expectancy 53.8 
+##  9 Germany     1962  fertility        2.47
+## 10 South Korea 1962  fertility        5.79
+## # ... with 214 more rows</code></pre>
+<pre class="r"><code># separate then spread
+dat %&gt;% separate(key, c(&quot;year&quot;, &quot;variable_name&quot;), sep = &quot;_&quot;, extra = &quot;merge&quot;) %&gt;%
+  spread(variable_name, value) </code></pre>
+<pre><code>## # A tibble: 112 x 4
+##    country year  fertility life_expectancy
+##    &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;           &lt;dbl&gt;
+##  1 Germany 1960       2.41            69.3
+##  2 Germany 1961       2.44            69.8
+##  3 Germany 1962       2.47            70.0
+##  4 Germany 1963       2.49            70.1
+##  5 Germany 1964       2.49            70.7
+##  6 Germany 1965       2.48            70.6
+##  7 Germany 1966       2.44            70.8
+##  8 Germany 1967       2.37            71.0
+##  9 Germany 1968       2.28            70.6
+## 10 Germany 1969       2.17            70.5
+## # ... with 102 more rows</code></pre>
 </div>
 
 
